@@ -766,6 +766,7 @@ const _installInContext: InstallFunction = async (projects, ctx, opts) => {
       engineStrict: opts.engineStrict,
       force: opts.force,
       forceFullResolution,
+      hardLinkLocalPackages: opts.hardLinkLocalPackages,
       hooks: opts.hooks,
       linkWorkspacePackagesDepth: opts.linkWorkspacePackagesDepth ?? (opts.saveWorkspaceProtocol ? 0 : -1),
       lockfileDir: opts.lockfileDir,

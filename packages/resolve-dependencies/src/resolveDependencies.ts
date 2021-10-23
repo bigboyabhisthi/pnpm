@@ -144,6 +144,7 @@ export interface ResolutionContext {
   registries: Registries
   virtualStoreDir: string
   updateMatching?: (pkgName: string) => boolean
+  hardLinkLocalPackages?: boolean
 }
 
 export type PkgAddress = {
@@ -666,7 +667,7 @@ async function resolveDependency (
     return null
   }
 
-  if (pkgResponse.body.isLocal) {
+  if (pkgResponse.body.isLocal && !ctx.hardLinkLocalPackages) {
     const manifest = pkgResponse.body.manifest ?? await pkgResponse.bundledManifest!() // eslint-disable-line @typescript-eslint/dot-notation
     return {
       alias: wantedDependency.alias || manifest.name,
