@@ -38,7 +38,7 @@ function createPackageImporter (
       isBuilt = false
     }
     for (const [fileName, fileMeta] of Object.entries(filesIndex)) {
-      filesMap[fileName] = getFilePathByModeInCafs(fileMeta.integrity, fileMeta.mode)
+      filesMap[fileName] = fileMeta.location ?? getFilePathByModeInCafs(fileMeta.integrity, fileMeta.mode)
     }
     const importMethod = await impPkg(to, { filesMap, fromStore: opts.filesResponse.fromStore, force: opts.force })
     return { importMethod, isBuilt }

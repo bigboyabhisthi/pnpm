@@ -7,6 +7,7 @@ export interface PackageFileInfo {
   integrity: string
   mode: number
   size: number
+  location?: string
 }
 
 export interface PackageFilesResponse {
@@ -63,5 +64,6 @@ export interface FilesIndex {
     mode: number
     size: number
     writeResult: Promise<FileWriteResult>
+    location?: string
   }
 }
