@@ -1,4 +1,5 @@
 import path from 'path'
+import assertProject from '@pnpm/assert-project'
 import { MutatedProject, mutateModules } from '@pnpm/core'
 import { preparePackages } from '@pnpm/prepare'
 import { testDefaults } from '../utils'
@@ -75,4 +76,25 @@ test('hard link local packages', async () => {
 
   await projects['project-2'].has('is-positive')
   await projects['project-2'].has('project-1')
+
+  console.log(process.cwd())
+  const rootModules = assertProject(process.cwd())
+  const lockfile = await rootModules.readLockfile()
+  expect(lockfile.packages['local/project-1_is-positive@1.0.0']).toEqual({
+    resolution: {
+      directory: 'project-1',
+      type: 'directory',
+    },
+    id: 'local/project-1',
+    name: 'project-1',
+    version: '1.0.0',
+    peerDependencies: {
+      'is-positive': '1.0.0',
+    },
+    dependencies: {
+      'is-negative': '1.0.0',
+      'is-positive': '1.0.0',
+    },
+    dev: false,
+  })
 })
