@@ -13,6 +13,7 @@ import {
   StoreController,
 } from '@pnpm/store-controller-types'
 import loadJsonFile from 'load-json-file'
+import memoize from 'mem'
 import pathTemp from 'path-temp'
 import writeJsonFile from 'write-json-file'
 import createImportPackage from './createImportPackage'
@@ -24,7 +25,8 @@ function createPackageImporter (
     cafsDir: string
   }
 ): ImportPackageFunction {
-  const impPkg = createImportPackage(opts.packageImportMethod)
+  const cachedImporterCreator = memoize(createImportPackage)
+  const packageImportMethod = opts.packageImportMethod
   const getFilePathByModeInCafs = _getFilePathByModeInCafs.bind(null, opts.cafsDir)
   return async (to, opts) => {
     const filesMap = {} as Record<string, string>
@@ -40,6 +42,7 @@ function createPackageImporter (
     for (const [fileName, fileMeta] of Object.entries(filesIndex)) {
       filesMap[fileName] = fileMeta.location ?? getFilePathByModeInCafs(fileMeta.integrity, fileMeta.mode)
     }
+    const impPkg = cachedImporterCreator(opts.filesResponse.packageImportMethod ?? packageImportMethod)
     const importMethod = await impPkg(to, { filesMap, fromStore: opts.filesResponse.fromStore, force: opts.force })
     return { importMethod, isBuilt }
   }

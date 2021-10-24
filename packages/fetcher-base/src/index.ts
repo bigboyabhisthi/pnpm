@@ -13,6 +13,7 @@ export interface PackageFileInfo {
 export interface PackageFilesResponse {
   fromStore: boolean
   filesIndex: Record<string, PackageFileInfo>
+  packageImportMethod?: 'auto' | 'hardlink' | 'copy' | 'clone'
   sideEffects?: Record<string, Record<string, PackageFileInfo>>
 }
 

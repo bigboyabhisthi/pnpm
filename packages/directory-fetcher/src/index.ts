@@ -20,7 +20,10 @@ export default () => {
       if (opts.manifest) {
         opts.manifest.resolve(await loadJsonFile(path.join(resolution.directory, 'package.json')))
       }
-      return { filesIndex }
+      return {
+        filesIndex,
+        packageImportMethod: 'hardlink',
+      }
     },
   }
 }

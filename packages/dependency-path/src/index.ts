@@ -44,7 +44,7 @@ export function refToAbsolute (
   registries: Registries
 ) {
   if (reference.startsWith('link:')) {
-    return reference
+    return null
   }
   if (!reference.includes('/')) {
     const registryName = encodeRegistry(getRegistryByPackageName(registries, pkgName))
@@ -79,7 +79,7 @@ export function refToRelative (
   pkgName: string
 ) {
   if (reference.startsWith('link:')) {
-    return reference
+    return null
   }
   if (reference.startsWith('file:')) {
     return reference

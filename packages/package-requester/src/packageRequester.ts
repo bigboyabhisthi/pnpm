@@ -541,6 +541,7 @@ Actual package in the store by the given integrity: ${pkgFilesIndex.name}@${pkgF
       files.resolve({
         filesIndex: integrity,
         fromStore: false,
+        packageImportMethod: fetchedPackage['packageImportMethod'],
       })
       finishing.resolve(undefined)
     } catch (err: any) { // eslint-disable-line
