@@ -672,6 +672,9 @@ importers:
   packages/directory-fetcher:
     specifiers:
       '@pnpm/directory-fetcher': 'link:'
+      load-json-file: ^6.2.0
+    dependencies:
+      load-json-file: 6.2.0
     devDependencies:
       '@pnpm/directory-fetcher': 'link:'
 

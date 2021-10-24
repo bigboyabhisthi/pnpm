@@ -199,7 +199,6 @@ async function resolveAndFetch (
         resolvedVia,
         updated,
       },
-      bundledManifest: async () => manifest!,
     }
   }
 

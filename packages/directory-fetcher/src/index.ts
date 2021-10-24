@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import { Cafs, FilesIndex } from '@pnpm/fetcher-base'
+import { Cafs, FilesIndex, DeferredManifestPromise } from '@pnpm/fetcher-base'
+import loadJsonFile from 'load-json-file'
 
 export default () => {
   return {
@@ -9,10 +10,16 @@ export default () => {
       resolution: {
         directory: string
         type: 'directory'
+      },
+      opts: {
+        manifest?: DeferredManifestPromise
       }
     ) {
       const filesIndex: FilesIndex = {}
       await mapDirectory(resolution.directory, resolution.directory, filesIndex)
+      if (opts.manifest) {
+        opts.manifest.resolve(await loadJsonFile(path.join(resolution.directory, 'package.json')))
+      }
       return { filesIndex }
     },
   }

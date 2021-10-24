@@ -31,7 +31,6 @@
   },
   "homepage": "https://github.com/pnpm/pnpm/blob/master/packages/directory-fetcher#readme",
   "dependencies": {
-  },
-  "devDependencies": {
+    "load-json-file": "^6.2.0"
   }
 }
