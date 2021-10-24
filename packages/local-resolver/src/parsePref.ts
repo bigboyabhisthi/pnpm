@@ -20,10 +20,11 @@ export interface LocalPackageSpec {
 export default function parsePref (
   pref: string,
   projectDir: string,
-  lockfileDir: string
+  lockfileDir: string,
+  hardLinkLocalPackages?: boolean
 ): LocalPackageSpec | null {
   if (pref.startsWith('link:') || pref.startsWith('workspace:')) {
-    return fromLocal(pref, projectDir, lockfileDir, 'directory')
+    return fromLocal(pref, projectDir, lockfileDir, 'directory', hardLinkLocalPackages)
   }
   if (pref.endsWith('.tgz') ||
     pref.endsWith('.tar.gz') ||
@@ -51,13 +52,14 @@ function fromLocal (
   pref: string,
   projectDir: string,
   lockfileDir: string,
-  type: 'file' | 'directory'
+  type: 'file' | 'directory',
+  hardLinkLocalPackages?: boolean
 ): LocalPackageSpec {
   const spec = pref.replace(/\\/g, '/')
     .replace(/^(file|link|workspace):[/]*([A-Za-z]:)/, '$2') // drive name paths on windows
     .replace(/^(file|link|workspace):(?:[/]*([~./]))?/, '$2')
 
-  const protocol = type === 'directory' ? 'link:' : 'file:'
+  const protocol = type === 'directory' ? (hardLinkLocalPackages ? 'local/' : 'link:') : 'file:'
   let fetchSpec!: string
   let normalizedPref!: string
   if (/^~[/]/.test(spec)) {
@@ -74,7 +76,7 @@ function fromLocal (
   }
 
   const dependencyPath = normalize(path.relative(projectDir, fetchSpec))
-  const id = type === 'directory' || projectDir === lockfileDir
+  const id = !hardLinkLocalPackages && (type === 'directory' || projectDir === lockfileDir)
     ? `${protocol}${dependencyPath}`
     : `${protocol}${normalize(path.relative(lockfileDir, fetchSpec))}`
 

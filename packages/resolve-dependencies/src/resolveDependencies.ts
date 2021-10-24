@@ -618,6 +618,7 @@ async function resolveDependency (
         : undefined,
       defaultTag: ctx.defaultTag,
       downloadPriority: -options.currentDepth,
+      hardLinkLocalPackages: ctx.hardLinkLocalPackages,
       lockfileDir: ctx.lockfileDir,
       preferredVersions: options.preferredVersions,
       preferWorkspacePackages: ctx.preferWorkspacePackages,
@@ -667,7 +668,7 @@ async function resolveDependency (
     return null
   }
 
-  if (pkgResponse.body.isLocal && !ctx.hardLinkLocalPackages) {
+  if (pkgResponse.body.isLocal) {
     const manifest = pkgResponse.body.manifest ?? await pkgResponse.bundledManifest!() // eslint-disable-line @typescript-eslint/dot-notation
     return {
       alias: wantedDependency.alias || manifest.name,
