@@ -2,6 +2,7 @@ import path from 'path'
 import assertProject from '@pnpm/assert-project'
 import { MutatedProject, mutateModules } from '@pnpm/core'
 import { preparePackages } from '@pnpm/prepare'
+import rimraf from '@zkochan/rimraf'
 import { testDefaults } from '../utils'
 
 test('hard link local packages', async () => {
@@ -77,7 +78,6 @@ test('hard link local packages', async () => {
   await projects['project-2'].has('is-positive')
   await projects['project-2'].has('project-1')
 
-  console.log(process.cwd())
   const rootModules = assertProject(process.cwd())
   const lockfile = await rootModules.readLockfile()
   expect(lockfile.packages['local/project-1_is-positive@1.0.0']).toEqual({
@@ -97,4 +97,21 @@ test('hard link local packages', async () => {
     },
     dev: false,
   })
+
+  await rimraf('node_modules')
+  await rimraf('project-1/node_modules')
+  await rimraf('project-2/node_modules')
+
+  await mutateModules(importers, await testDefaults({
+    frozenLockfile: true,
+    hardLinkLocalPackages: true,
+    workspacePackages,
+  }))
+
+  await projects['project-1'].has('is-negative')
+  await projects['project-1'].has('dep-of-pkg-with-1-dep')
+  await projects['project-1'].hasNot('is-positive')
+
+  await projects['project-2'].has('is-positive')
+  await projects['project-2'].has('project-1')
 })
