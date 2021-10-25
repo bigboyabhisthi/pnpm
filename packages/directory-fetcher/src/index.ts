@@ -35,7 +35,7 @@ async function mapDirectory (
 ) {
   try {
     const files = await fs.readdir(currDir)
-    await Promise.all(files.map(async (file) => {
+    await Promise.all(files.filter((file) => file !== 'node_modules').map(async (file) => {
       const fullPath = path.join(currDir, file)
       const stat = await fs.stat(fullPath)
       if (stat.isDirectory()) {
