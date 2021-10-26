@@ -131,7 +131,7 @@ test('hard link local packages and relink them after build', async () => {
       'is-positive': '1.0.0',
     },
     scripts: {
-      postinstall: 'touch index.js',
+      prepublishOnly: 'touch main.js',
     },
   }
   const project2Manifest = {
@@ -193,7 +193,7 @@ test('hard link local packages and relink them after build', async () => {
   await projects['project-2'].has('is-positive')
   await projects['project-2'].has('project-1')
 
-  expect(pathExists(path.resolve('project-2/node_modules/project-1/index.js'))).toBeTruthy()
+  expect(await pathExists(path.resolve('project-2/node_modules/project-1/main.js'))).toBeTruthy()
 
   const rootModules = assertProject(process.cwd())
   const lockfile = await rootModules.readLockfile()
@@ -208,7 +208,6 @@ test('hard link local packages and relink them after build', async () => {
     peerDependencies: {
       'is-positive': '1.0.0',
     },
-    requiresBuild: true,
     dependencies: {
       'is-negative': '1.0.0',
       'is-positive': '1.0.0',
@@ -217,6 +216,7 @@ test('hard link local packages and relink them after build', async () => {
   })
 
   await rimraf('node_modules')
+  await rimraf('project-1/main.js')
   await rimraf('project-1/node_modules')
   await rimraf('project-2/node_modules')
 
@@ -233,5 +233,5 @@ test('hard link local packages and relink them after build', async () => {
   await projects['project-2'].has('is-positive')
   await projects['project-2'].has('project-1')
 
-  expect(pathExists(path.resolve('project-2/node_modules/project-1/index.js'))).toBeTruthy()
+  expect(await pathExists(path.resolve('project-2/node_modules/project-1/main.js'))).toBeTruthy()
 })

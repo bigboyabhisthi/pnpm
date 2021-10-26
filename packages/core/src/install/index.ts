@@ -492,7 +492,12 @@ export async function mutateModules (
         scriptsOpts.extraEnv = makeNodeRequireOption(path.join(opts.lockfileDir, '.pnp.cjs'))
       }
       const projectsToBeBuilt = extendProjectsWithTargetDirs(projectsToBeInstalled, result.newLockfile, ctx)
-      await runLifecycleHooksConcurrently(['preinstall', 'install', 'postinstall', 'prepare'],
+      const scriptsToRun = ['preinstall', 'install', 'postinstall', 'prepare']
+      if (opts.hardLinkLocalPackages) {
+        // TODO: only run this if it is linked
+        scriptsToRun.push('prepublishOnly')
+      }
+      await runLifecycleHooksConcurrently(scriptsToRun,
         projectsToBeBuilt,
         opts.childConcurrency,
         scriptsOpts
@@ -513,10 +518,10 @@ function extendProjectsWithTargetDirs (
 ) {
   const projectsById = fromPairs(projectsToBeInstalled.map((project) => [project.id, { ...project, targetDirs: [] as string[] }]))
   Object.entries(lockfile.packages ?? {})
-    .filter(([depPath, pkg]) => pkg.resolution?.['type'] === 'directory' && projectsById[pkg.id!] != null)
+    .filter(([depPath, pkg]) => pkg.resolution?.['type'] === 'directory' && projectsById[pkg.id!.replace(/^local\//, '')] != null)
     .forEach(([depPath, pkg]) => {
-      const localLocation = path.join(ctx.virtualStoreDir, depPathToFilename(depPath, ctx.lockfileDir))
-      projectsById[pkg.id!].targetDirs.push(localLocation)
+      const localLocation = path.join(ctx.virtualStoreDir, depPathToFilename(depPath, ctx.lockfileDir), 'node_modules', pkg.name!)
+      projectsById[pkg.id!.replace(/^local\//, '')].targetDirs.push(localLocation)
     })
   return Object.values(projectsById)
 }
