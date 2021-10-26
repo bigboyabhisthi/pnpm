@@ -165,6 +165,7 @@ export default async (opts: HeadlessOptions) => {
     scriptShell: opts.scriptShell,
     shellEmulator: opts.shellEmulator,
     stdio: opts.ownLifecycleHooksStdio ?? 'inherit',
+    storeController: opts.storeController,
     unsafePerm: opts.unsafePerm || false,
   }
 
