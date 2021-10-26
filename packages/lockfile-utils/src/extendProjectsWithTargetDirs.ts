@@ -13,10 +13,13 @@ export default function extendProjectsWithTargetDirs<T> (
 ) {
   const projectsById = fromPairs(projects.map((project) => [project.id, { ...project, targetDirs: [] as string[] }]))
   Object.entries(lockfile.packages ?? {})
-    .filter(([depPath, pkg]) => pkg.resolution?.['type'] === 'directory' && projectsById[pkg.id!.replace(/^local\//, '')] != null)
     .forEach(([depPath, pkg]) => {
+      if (pkg.resolution?.['type'] !== 'directory') return
+      const pkgId = pkg.id ?? depPath
+      const importerId = pkgId.replace(/^local\//, '')
+      if (projectsById[importerId] == null) return
       const localLocation = path.join(ctx.virtualStoreDir, depPathToFilename(depPath, ctx.lockfileDir), 'node_modules', pkg.name!)
-      projectsById[pkg.id!.replace(/^local\//, '')].targetDirs.push(localLocation)
+      projectsById[importerId].targetDirs.push(localLocation)
     })
   return Object.values(projectsById)
 }
