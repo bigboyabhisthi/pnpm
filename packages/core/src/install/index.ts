@@ -27,6 +27,7 @@ import {
   writeWantedLockfile,
 } from '@pnpm/lockfile-file'
 import { writePnpFile } from '@pnpm/lockfile-to-pnp'
+import { extendProjectsWithTargetDirs } from '@pnpm/lockfile-utils'
 import logger, { streamParser } from '@pnpm/logger'
 import { getAllDependenciesFromManifest } from '@pnpm/manifest-utils'
 import { write as writeModulesYaml } from '@pnpm/modules-yaml'
@@ -49,7 +50,6 @@ import {
   ReadPackageHook,
 } from '@pnpm/types'
 import rimraf from '@zkochan/rimraf'
-import { depPathToFilename } from 'dependency-path'
 import isInnerLink from 'is-inner-link'
 import pFilter from 'p-filter'
 import pLimit from 'p-limit'
@@ -260,6 +260,7 @@ export async function mutateModules (
             extendNodePath: opts.extendNodePath,
             extraBinPaths: opts.extraBinPaths,
             force: opts.force,
+            hardLinkLocalPackages: opts.hardLinkLocalPackages,
             hoistedDependencies: ctx.hoistedDependencies,
             hoistPattern: ctx.hoistPattern,
             ignoreScripts: opts.ignoreScripts,
@@ -506,24 +507,6 @@ export async function mutateModules (
 
     return result.projects
   }
-}
-
-function extendProjectsWithTargetDirs (
-  projectsToBeInstalled: ProjectToBeInstalled[],
-  lockfile: Lockfile,
-  ctx: {
-    lockfileDir: string
-    virtualStoreDir: string
-  }
-) {
-  const projectsById = fromPairs(projectsToBeInstalled.map((project) => [project.id, { ...project, targetDirs: [] as string[] }]))
-  Object.entries(lockfile.packages ?? {})
-    .filter(([depPath, pkg]) => pkg.resolution?.['type'] === 'directory' && projectsById[pkg.id!.replace(/^local\//, '')] != null)
-    .forEach(([depPath, pkg]) => {
-      const localLocation = path.join(ctx.virtualStoreDir, depPathToFilename(depPath, ctx.lockfileDir), 'node_modules', pkg.name!)
-      projectsById[pkg.id!.replace(/^local\//, '')].targetDirs.push(localLocation)
-    })
-  return Object.values(projectsById)
 }
 
 export function createObjectChecksum (obj: Object) {
