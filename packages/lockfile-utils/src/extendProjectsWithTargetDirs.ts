@@ -20,4 +20,3 @@ export default function extendProjectsWithTargetDirs<T> (
     })
   return Object.values(projectsById)
 }
-

@@ -509,7 +509,7 @@ Actual package in the store by the given integrity: ${pkgFilesIndex.name}@${pkgF
             if (filesIndex[filename].writeResult == null) {
               integrity[filename] = {
                 location: filesIndex[filename].location,
-              } as any
+              } as any // eslint-disable-line
               return
             }
             const {

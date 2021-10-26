@@ -46,7 +46,7 @@ async function mapDirectory (
         const relativePath = path.relative(rootDir, fullPath)
         index[relativePath] = {
           location: fullPath,
-        } as any
+        } as any // eslint-disable-line
       }
     }))
   } catch (err: any) { // eslint-disable-line
